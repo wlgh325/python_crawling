@@ -16,6 +16,10 @@ BeautifulSoup
 [selenium python exam](https://selenium-python.readthedocs.io/locating-elements.html)
 
 ---
+
+# 크롤링 프로젝트
+* 모두 chromewebdriver는 따로 설치하셔야 합니다.
+기본적인 selenium 사용법은 [이 글](https://hoho325.tistory.com/265)을 참고해주세요!!
 1. Selenium을 이용한 카카오맵 리뷰 파이썬 크롤링
 ```text
 카카오맵에서 제공하는 장소들의 리뷰들을 자동으로 크롤링 해주는 코드입니다.  
