@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 ##################### variable related selenium ##########################
 ##########################################################################
 options = webdriver.ChromeOptions()
-#options.add_argument('headless')
+options.add_argument('headless')
 options.add_argument('lang=ko_KR')
 chromedriver_path = "chromedriver"
 driver = webdriver.Chrome(os.path.join(os.getcwd(), chromedriver_path), options=options)  # chromedriver 열기
@@ -25,9 +25,10 @@ def main():
     driver.get('https://map.kakao.com/')  # 주소 가져오기
 
     # 카페 정보 읽어오기
-    place_infos = ['강남 맛집용]
+    place_infos = ['강남 맛집']
 
     for i, place in enumerate(place_infos):
+        # delay
         if i % 4 == 0 and i != 0:
             sleep(5)
         print("#####", i)
@@ -70,7 +71,7 @@ def search(place):
 
             html = driver.page_source
             soup = BeautifulSoup(html, 'html.parser')
-            cafe_lists = soup.select('.placelist > .PlaceItem')
+            cafe_lists = soup.select('.placelist > .PlaceItem') # 장소 목록 list
 
             crawling(place, cafe_lists)
 
@@ -108,15 +109,16 @@ def crawling(place, cafe_lists):
         # 2-5 페이지
         idx = 3
         try:
-            page_num = len(driver.find_elements_by_class_name('link_page'))
+            page_num = len(driver.find_elements_by_class_name('link_page')) # 페이지 수 찾기
             for i in range(page_num-1):
+                # css selector를 이용해 페이지 버튼 누르기
                 driver.find_element_by_css_selector('#mArticle > div.cont_evaluation > div.evaluation_review > div > a:nth-child(' + str(idx) +')').send_keys(Keys.ENTER)
                 sleep(1)
                 extract_review(place_name)
                 idx += 1
-            driver.find_element_by_link_text('다음').send_keys(Keys.ENTER)
+            driver.find_element_by_link_text('다음').send_keys(Keys.ENTER) # 5페이지가 넘는 경우 다음 버튼 누르기
             sleep(1)
-            extract_review(place_name)
+            extract_review(place_name) # 리뷰 추출
         except (NoSuchElementException, ElementNotInteractableException):
             print("no review in crawling")
 
@@ -130,9 +132,9 @@ def crawling(place, cafe_lists):
                     sleep(1)
                     extract_review(place_name)
                     idx += 1
-                driver.find_element_by_link_text('다음').send_keys(Keys.ENTER)
+                driver.find_element_by_link_text('다음').send_keys(Keys.ENTER) # 10페이지 이상으로 넘어가기 위한 다음 버튼 클릭
                 sleep(1)
-                extract_review(place_name)
+                extract_review(place_name) # 리뷰 추출
             except (NoSuchElementException, ElementNotInteractableException):
                 print("no review in crawling")
                 break
