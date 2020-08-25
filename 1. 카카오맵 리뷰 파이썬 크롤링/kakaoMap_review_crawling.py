@@ -24,7 +24,7 @@ def main():
     driver.implicitly_wait(4)  # 렌더링 될때까지 기다린다 4초
     driver.get('https://map.kakao.com/')  # 주소 가져오기
 
-    # 카페 정보 읽어오기
+    # 검색할 목록
     place_infos = ['강남 맛집']
 
     for i, place in enumerate(place_infos):
@@ -47,14 +47,14 @@ def search(place):
     sleep(1)
 
     # 검색된 정보가 있는 경우에만 탐색
-    # 1번 페이지 cafe list 읽기
+    # 1번 페이지 place list 읽기
     html = driver.page_source
 
     soup = BeautifulSoup(html, 'html.parser')
-    cafe_lists = soup.select('.placelist > .PlaceItem') # 검색된 카페 목록
+    place_lists = soup.select('.placelist > .PlaceItem') # 검색된 장소 목록
 
-    # 검색된 첫 페이지 카페 목록 크롤링하기
-    crawling(place, cafe_lists)
+    # 검색된 첫 페이지 장소 목록 크롤링하기
+    crawling(place, place_lists)
     search_area.clear()
 
     # 우선 더보기 클릭해서 2페이지
@@ -71,9 +71,9 @@ def search(place):
 
             html = driver.page_source
             soup = BeautifulSoup(html, 'html.parser')
-            cafe_lists = soup.select('.placelist > .PlaceItem') # 장소 목록 list
+            place_lists = soup.select('.placelist > .PlaceItem') # 장소 목록 list
 
-            crawling(place, cafe_lists)
+            crawling(place, place_lists)
 
     except ElementNotInteractableException:
         print('not found')
@@ -81,20 +81,20 @@ def search(place):
         search_area.clear()
 
 
-def crawling(place, cafe_lists):
+def crawling(place, place_lists):
     """
     페이지 목록을 받아서 크롤링 하는 함수
-    :param place: 리뷰 정보 찾을 카페이름
+    :param place: 리뷰 정보 찾을 장소이름
     """
 
     while_flag = False
-    for i, cafe in enumerate(cafe_lists):
+    for i, place in enumerate(place_lists):
         # 광고에 따라서 index 조정해야함
         #if i >= 3:
          #   i += 1
 
-        place_name = cafe.select('.head_item > .tit_name > .link_name')[0].text  # place name
-        place_address = cafe.select('.info_item > .addr > p')[0].text  # place address
+        place_name = place.select('.head_item > .tit_name > .link_name')[0].text  # place name
+        place_address = place.select('.info_item > .addr > p')[0].text  # place address
 
         detail_page_xpath = '//*[@id="info.search.place.list"]/li[' + str(i + 1) + ']/div[5]/div[4]/a[1]'
         driver.find_element_by_xpath(detail_page_xpath).send_keys(Keys.ENTER)
